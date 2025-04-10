@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Sport & Santé Mentale</title>
+  <title>Sport & Santé Mentale - USA</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
@@ -26,70 +26,74 @@
   </style>
 </head>
 <body>
-  <h1>Heures de sport et trouble mental</h1>
-  <input type="file" id="csvFileInput" accept=".csv" />
+  <h1>Heures de sport et trouble mental (USA uniquement)</h1>
+
   <div class="chart-container">
     <canvas id="sportMentalChart"></canvas>
   </div>
 
   <script>
-    document.getElementById("csvFileInput").addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    function moyenne(arr) {
+      const valid = arr.filter(v => !isNaN(v));
+      return valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : 0;
+    }
 
-      Papa.parse(file, {
-        header: true,
-        complete: function(results) {
-          const data = results.data;
-          const oui = [];
-          const non = [];
+    fetch('mental_health_data.csv')
+      .then(res => res.text())
+      .then(csv => {
+        Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            const data = results.data;
+            const oui = [];
+            const non = [];
 
-          data.forEach(row => {
-            const hours = parseFloat(row["Physical_Activity_Hours"]);
-            const condition = row["Mental_Health_Condition"]?.trim();
+            data.forEach(row => {
+              if ((row["Country"] || "").trim().toUpperCase() !== "USA") return;
 
-            if (!isNaN(hours)) {
-              if (condition === "Yes") oui.push(hours);
-              else if (condition === "No") non.push(hours);
-            }
-          });
+              const hours = parseFloat(row["Physical_Activity_Hours"]);
+              const condition = (row["Mental_Health_Condition"] || "").trim();
 
-          const ctx = document.getElementById('sportMentalChart').getContext('2d');
-          new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: ['Oui', 'Non'],
-              datasets: [{
-                label: 'Heures moyennes de sport par semaine',
-                data: [
-                  oui.reduce((a, b) => a + b, 0) / oui.length,
-                  non.reduce((a, b) => a + b, 0) / non.length
-                ],
-                backgroundColor: ['#ef5350', '#66bb6a']
-              }]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                title: {
-                  display: true,
-                  text: 'Moyenne d’heures de sport selon la présence d’un trouble mental'
-                }
+              if (!isNaN(hours)) {
+                if (condition === "Yes") oui.push(hours);
+                else if (condition === "No") non.push(hours);
+              }
+            });
+
+            const ctx = document.getElementById('sportMentalChart').getContext('2d');
+            new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ['Avec trouble mental', 'Sans trouble mental'],
+                datasets: [{
+                  label: 'Heures moyennes de sport par semaine (USA)',
+                  data: [moyenne(oui), moyenne(non)],
+                  backgroundColor: ['#ef5350', '#66bb6a']
+                }]
               },
-              scales: {
-                y: {
-                  beginAtZero: true,
+              options: {
+                responsive: true,
+                plugins: {
                   title: {
                     display: true,
-                    text: 'Heures de sport'
+                    text: 'Moyenne d’heures de sport selon la présence d’un trouble mental (USA)'
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Heures de sport'
+                    }
                   }
                 }
               }
-            }
-          });
-        }
+            });
+          }
+        });
       });
-    });
   </script>
 </body>
 </html>

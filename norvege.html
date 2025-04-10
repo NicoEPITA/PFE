@@ -2,15 +2,16 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Impact du sport sur la santé mentale</title>
+  <title>Impact du sport sur la santé mentale - Norvège</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
+      background: radial-gradient(circle at top, #d1f0ff, #8ac6ff);
       margin: 0;
       padding: 2rem;
       color: #333;
+      text-align: center;
     }
     h1, h2 {
       text-align: center;
@@ -19,41 +20,68 @@
       max-width: 900px;
       margin: 2rem auto;
       background: white;
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 2rem;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
     }
     canvas {
       max-width: 100%;
     }
+    .description {
+      margin-top: 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #444;
+      text-align: left;
+    }
+    .link-etude {
+      margin-top: 2rem;
+      font-size: 1rem;
+    }
+    .link-etude a {
+      color: #1976d2;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .link-etude a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-  <h1>Impact du sport sur la santé mentale chez les adolescents</h1>
-  <p style="text-align:center; margin-top: -1rem;">
-    <a href="10.21307_sjcapp-2017-003.pdf" target="_blank" style="color: #1976d2; text-decoration: none;">
-      📄 Voir l’étude complète (PDF local)
-    </a>
-  </p>
+  <h1>Impact du sport sur la santé mentale chez les adolescents en Norvège</h1>
+
   <div class="chart-container">
     <h2>1. Troubles mentaux selon la participation sportive</h2>
     <canvas id="barMentalHealth"></canvas>
+    <div class="description">
+      Cette première visualisation met en évidence le lien entre le type de participation sportive et la prévalence de divers troubles mentaux chez les adolescents. On constate que les jeunes ne pratiquant aucune activité sportive présentent des taux plus élevés de symptômes totaux, de troubles émotionnels, de problèmes relationnels avec les pairs et d'impact sur la vie quotidienne. Plus la participation est compétitive, plus ces taux diminuent, ce qui suggère un effet protecteur de l'engagement sportif sur la santé mentale.
+    </div>
   </div>
 
   <div class="chart-container">
     <h2>2. Facteurs protecteurs liés à la pratique sportive</h2>
     <canvas id="barProtectiveFactors"></canvas>
+    <div class="description">
+      Ce graphique met en lumière les comportements positifs corrélés à la pratique sportive. Les adolescents engagés dans un sport, en particulier de manière compétitive, sont plus susceptibles d'adopter une alimentation saine, d'avoir un cercle social large (> 5 amis), et de faire de l'exercice au moins 4 fois par semaine. Ces facteurs sont bien connus pour leur effet bénéfique sur la santé mentale, renforçant le rôle structurant du sport dans le mode de vie des jeunes.
+    </div>
   </div>
 
   <div class="chart-container">
     <h2>3. Courbe des indicateurs de bonne santé mentale</h2>
     <canvas id="lineMentalHealth"></canvas>
+    <div class="description">
+      Ici, nous visualisons la proportion d'adolescents dont les scores sont considérés comme "normaux" dans les différentes dimensions de la santé mentale. Encore une fois, les résultats montrent que les jeunes engagés dans des activités sportives compétitives présentent une meilleure santé mentale globale. On note une progression nette de la normalité des scores avec le niveau d’engagement sportif, ce qui renforce l’hypothèse que l’activité physique agit comme un facteur protecteur.
+    </div>
+  </div>
+
+  <div class="link-etude">
+    📄 Étude source : <a href="./10.21307_sjcapp-2017-003.pdf" target="_blank">10.21307_sjcapp-2017-003.pdf</a>
   </div>
 
   <script>
     const participationLabels = ["No Sport", "Noncompetitive", "Competitive"];
 
-    // 1. Barres - Troubles mentaux
     new Chart(document.getElementById("barMentalHealth"), {
       type: 'bar',
       data: {
@@ -74,7 +102,6 @@
       }
     });
 
-    // 2. Barres - Facteurs protecteurs
     new Chart(document.getElementById("barProtectiveFactors"), {
       type: 'bar',
       data: {
@@ -94,7 +121,6 @@
       }
     });
 
-    // 3. Courbes - Scores normaux
     new Chart(document.getElementById("lineMentalHealth"), {
       type: 'line',
       data: {

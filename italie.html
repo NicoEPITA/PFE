@@ -2,34 +2,56 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Santé mentale & entraînement</title>
+  <title>Santé mentale & entraînement - Italie</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f8;
+      background: radial-gradient(circle at top, #fdfdfd, #bde0fe);
       text-align: center;
       padding: 2rem;
+      margin: 0;
     }
     .chart-container {
       max-width: 900px;
       margin: auto;
       background: white;
       padding: 2rem;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .description {
+      margin-top: 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #444;
+      text-align: left;
+    }
+    a {
+      color: #1976d2;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h1>Santé mentale & heures d'entraînement par semaine</h1>
   <p style="margin-top: -1rem;">
-    <a href="Data_Sheet_1_Just_Do_It_ High_Intensity_Physical_Activity_Preserves_Mental_and_Physical_Health_in_Elite_and_Non-elite_Athletes_During_COVID-19.docx" target="_blank" style="color: #1976d2; text-decoration: none;">
+    <a href="Data_Sheet_1_Just_Do_It_ High_Intensity_Physical_Activity_Preserves_Mental_and_Physical_Health_in_Elite_and_Non-elite_Athletes_During_COVID-19.docx" target="_blank">
       📄 Télécharger l’étude complète (DOCX local)
     </a>
   </p>
+
   <div class="chart-container">
     <canvas id="mentalSportChart"></canvas>
+    <div class="description">
+      Cette étude italienne a été menée durant la période du confinement lié à la pandémie de COVID-19. Elle s'intéresse à l'impact de l’intensité de l’activité physique sur la santé mentale et physique d’athlètes de différents niveaux. Le graphique présente une comparaison entre les scores de santé mentale (SF-12) et les heures hebdomadaires d'entraînement pour quatre groupes : hommes et femmes athlètes d’élite, et non-élites.
+      <br><br>
+      Les résultats montrent une tendance claire : plus le niveau d'engagement est élevé, plus le score de santé mentale est favorable. Les athlètes d'élite, en particulier les hommes, obtiennent les meilleurs scores. Les heures d'entraînement suivent également cette hiérarchie. L'étude conclut que l’activité physique intense contribue positivement au bien-être mental, même en période de crise sanitaire.
+    </div>
   </div>
 
   <script>

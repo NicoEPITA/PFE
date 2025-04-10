@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Santé mentale - Athlètes vs Non-Athlètes (UK)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #f4f6f8, #b8d8f8);
+      text-align: center;
+      padding: 2rem;
+      margin: 0;
+    }
+    .chart-container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .description {
+      margin-top: 1rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #444;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>Comparaison du bien-être mental</h1>
+  <p style="margin-top: -1rem;">
+    <a href="Athlete_Non-Athlete_MH_Survey_UK.xlsx" target="_blank">
+      📄 Télécharger l’étude complète (DOCX local)
+    </a>
+    </p>
+
+  <div class="chart-container">
+    <canvas id="mentalChart"></canvas>
+    <div class="description">
+      Cette étude menée au Royaume-Uni examine les différences de bien-être mental entre les individus pratiquant une activité sportive compétitive et ceux n’en pratiquant pas. En s’appuyant sur une agrégation de divers indicateurs liés à la santé mentale (comme le stress, la tristesse, les pensées négatives ou l’anxiété), on calcule un score moyen global : plus le score est bas, meilleure est la santé mentale.
+      <br><br>
+      Le graphique met en évidence que les athlètes obtiennent un score moyen inférieur à celui des non-athlètes, suggérant qu’une activité physique régulière et structurée est associée à un meilleur état mental général. Ces résultats confirment l'effet bénéfique du sport sur la résilience émotionnelle et la régulation du stress dans le contexte britannique.
+    </div>
+  </div>
+
+  <script>
+    function average(arr) {
+      const valid = arr.filter(v => !isNaN(v));
+      return valid.reduce((a, b) => a + b, 0) / valid.length;
+    }
+
+    fetch('Athlete_Non-Athlete_MH_Survey_UK.xlsx')
+      .then(res => res.arrayBuffer())
+      .then(buffer => {
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(sheet);
+
+        const athleteCol = "Are you an athlete involved in a structured, rule-bound, competitive physical activity?";
+        const keywords = ["feel", "mental", "worthless", "empty", "cope", "down", "trouble", "sad", "hopeless", "nervous"];
+        const mentalCols = Object.keys(data[0]).filter(f => keywords.some(k => f.toLowerCase().includes(k)));
+
+        const athleteScores = [], nonAthleteScores = [];
+
+        data.forEach(row => {
+          const mentalValues = mentalCols.map(col => parseFloat(row[col])).filter(val => !isNaN(val));
+          if (mentalValues.length === 0) return;
+          const mean = mentalValues.reduce((a, b) => a + b, 0) / mentalValues.length;
+          const type = (row[athleteCol] || '').toString().trim().toLowerCase();
+          if (type === 'yes') athleteScores.push(mean);
+          else if (type === 'no') nonAthleteScores.push(mean);
+        });
+
+        const avgAthlete = average(athleteScores);
+        const avgNonAthlete = average(nonAthleteScores);
+
+        const ctx = document.getElementById("mentalChart").getContext("2d");
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ["Non-athlètes", "Athlètes"],
+            datasets: [{
+              label: "Score moyen santé mentale (plus bas = mieux)",
+              data: [avgNonAthlete, avgAthlete],
+              backgroundColor: ["indianred", "mediumseagreen"]
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 5
+              }
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: "Comparaison du score de santé mentale (agrégé)"
+              }
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
