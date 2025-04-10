@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Santé mentale & entraînement</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      text-align: center;
+      padding: 2rem;
+    }
+    .chart-container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Santé mentale & heures d'entraînement par semaine</h1>
+  <div class="chart-container">
+    <canvas id="mentalSportChart"></canvas>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('mentalSportChart').getContext('2d');
+
+    const labels = ["Elite H", "Elite F", "Non-elite H", "Non-elite F"];
+    const mentalHealth = [47.8, 46.3, 45.35, 44.3];
+    const trainingHours = [6.65, 5.7, 5.5, 4.9];
+
+    const mentalColor = 'royalblue';
+    const trainColor = 'seagreen';
+
+    const data = {
+      labels: labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Santé mentale (SF-12)',
+          data: mentalHealth,
+          backgroundColor: mentalColor,
+          yAxisID: 'y1'
+        },
+        {
+          type: 'line',
+          label: "Heures d'entraînement / semaine",
+          data: trainingHours,
+          borderColor: trainColor,
+          backgroundColor: trainColor,
+          yAxisID: 'y2',
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    };
+
+    const config = {
+      type: 'bar',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Santé mentale comparée au temps de pratique hebdo (groupes fusionnés)'
+          }
+        },
+        scales: {
+          y1: {
+            type: 'linear',
+            position: 'left',
+            title: {
+              display: true,
+              text: 'Score SF-12 (santé mentale)'
+            },
+            beginAtZero: false
+          },
+          y2: {
+            type: 'linear',
+            position: 'right',
+            title: {
+              display: true,
+              text: "Heures d'entraînement / semaine"
+            },
+            beginAtZero: true,
+            grid: {
+              drawOnChartArea: false
+            }
+          }
+        }
+      }
+    };
+
+    new Chart(ctx, config);
+  </script>
+</body>
+</html>

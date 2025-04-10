@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Impact du sport sur la santé mentale</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .chart-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    canvas {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Impact du sport sur la santé mentale chez les adolescents</h1>
+
+  <div class="chart-container">
+    <h2>1. Troubles mentaux selon la participation sportive</h2>
+    <canvas id="barMentalHealth"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h2>2. Facteurs protecteurs liés à la pratique sportive</h2>
+    <canvas id="barProtectiveFactors"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h2>3. Courbe des indicateurs de bonne santé mentale</h2>
+    <canvas id="lineMentalHealth"></canvas>
+  </div>
+
+  <script>
+    const participationLabels = ["No Sport", "Noncompetitive", "Competitive"];
+
+    // 1. Barres - Troubles mentaux
+    new Chart(document.getElementById("barMentalHealth"), {
+      type: 'bar',
+      data: {
+        labels: participationLabels,
+        datasets: [
+          { label: "Total Symptoms", data: [27, 18.7, 14.9] },
+          { label: "Impact Daily Life", data: [29.8, 24.7, 17.4] },
+          { label: "Emotional Problems", data: [29.5, 22.9, 15.5] },
+          { label: "Peer Problems", data: [22.8, 15.7, 12.8] }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: false }
+        }
+      }
+    });
+
+    // 2. Barres - Facteurs protecteurs
+    new Chart(document.getElementById("barProtectiveFactors"), {
+      type: 'bar',
+      data: {
+        labels: participationLabels,
+        datasets: [
+          { label: "Alimentation saine", data: [16.9, 27.0, 27.2] },
+          { label: "> 5 amis", data: [26.1, 31.2, 41.6] },
+          { label: "Exercice ≥4x/semaine", data: [7.0, 18.8, 51.7] }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: false }
+        }
+      }
+    });
+
+    // 3. Courbes - Scores normaux
+    new Chart(document.getElementById("lineMentalHealth"), {
+      type: 'line',
+      data: {
+        labels: participationLabels,
+        datasets: [
+          { label: "Total Symptoms - Normaux", data: [73, 81.3, 85.1], fill: false, tension: 0.3 },
+          { label: "Impact - Normal", data: [70.2, 75.3, 82.6], fill: false, tension: 0.3 },
+          { label: "Problèmes émotionnels - Normaux", data: [70.5, 77.1, 84.5], fill: false, tension: 0.3 },
+          { label: "Problèmes de pair - Normaux", data: [77.2, 84.3, 87.2], fill: false, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

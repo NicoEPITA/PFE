@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Accueil - Activité physique & Santé mentale</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    .countries {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+    }
+    .country {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .country:hover {
+      transform: scale(1.05);
+    }
+    .country svg {
+      width: 150px;
+      height: auto;
+      display: block;
+      margin: 0 auto 1rem;
+    }
+    .country-name {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Choisissez un pays pour explorer les données</h1>
+  <div class="countries">
+    <div class="country" onclick="window.location.href='norvege.html'">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 10 L54 10 L54 54 L10 54 Z M20 20 L44 20 L44 44 L20 44 Z" fill="#d32f2f" />
+        <path d="M28 10 V54 M10 28 H54" stroke="#ffffff" stroke-width="4" />
+        <path d="M30 10 V54 M10 30 H54" stroke="#1976d2" stroke-width="2" />
+      </svg>
+      <div class="country-name">Norvège</div>
+    </div>
+    <div class="country" onclick="window.location.href='italie.html'">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="14" height="44" fill="#009246" /> <!-- Vert -->
+        <rect x="24" y="10" width="16" height="44" fill="#ffffff" /> <!-- Blanc -->
+        <rect x="40" y="10" width="14" height="44" fill="#ce2b37" /> <!-- Rouge -->
+      </svg>
+      <div class="country-name">Italie</div>
+    </div>
+    <div class="country" onclick="window.location.href='usa.html'">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <rect width="64" height="64" fill="#b22234" />
+        <g fill="#ffffff">
+          <rect y="5.8" width="64" height="5.8"/>
+          <rect y="17.4" width="64" height="5.8"/>
+          <rect y="29" width="64" height="5.8"/>
+          <rect y="40.6" width="64" height="5.8"/>
+          <rect y="52.2" width="64" height="5.8"/>
+        </g>
+        <rect width="25.6" height="29" fill="#3c3b6e" />
+      </svg>
+      <div class="country-name">États-Unis</div>
+    </div>
+  </div>
+</body>
+</html>
