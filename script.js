@@ -98,3 +98,27 @@ function resetHighlight(e) {
         fillOpacity: 0.7
     });
 }
+
+// Ajout d'une légende personnalisée en bas à droite
+var legend = L.control({ position: 'bottomright' });
+
+legend.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [0, 0.25, 0.5, 0.75, 1],
+        labels = [];
+
+    div.innerHTML += "<strong>Échelle HDI</strong><br>";
+
+    // Boucle sur les intervalles et génère les labels avec couleurs associées
+    for (var i = 0; i < grades.length - 1; i++) {
+        var color = getColor((grades[i] + grades[i + 1]) / 2); // Couleur moyenne pour l'intervalle
+        div.innerHTML +=
+            '<i style="background:' + color + '; width:18px; height:18px; float:left; margin-right:5px; opacity:0.8;"></i> ' +
+            grades[i] + ' - ' + grades[i + 1] + '<br>';
+    }
+
+    return div;
+};
+
+legend.addTo(map);
+
