@@ -33,13 +33,19 @@ async function loadHDIData() {
 }
 
 
-// Fonction pour obtenir une couleur selon le HDI
 function getColor(hdi) {
-    return hdi > 0.8 ? '#1a9850' :      // vert (HDI élevé)
-           hdi > 0.6 ? '#fee08b' :      // orange clair (moyen-haut)
-           hdi > 0.4 ? '#fdae61' :      // orange foncé (moyen-bas)
-                       '#d73027';       // rouge (HDI faible)
+    if (isNaN(hdi)) return '#ccc';
+
+    const red = hdi < 0.5 ? 220 : Math.round(220 - (hdi - 0.5) * 2 * 220);
+    
+    const green = hdi > 0.5 ? 180 : Math.round(hdi * 2 * 180);
+
+    const blue = hdi > 0.5 ? Math.round((hdi - 0.5) * 2 * 120) : 0;
+
+    return `rgb(${red},${green},${blue})`;
 }
+
+
 
 // Charger GeoJSON et HDI, puis afficher
 Promise.all([
