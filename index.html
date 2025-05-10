@@ -1,6 +1,43 @@
 <!DOCTYPE html>
 <html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Carte HDI interactive</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #map {
+            height: 100vh;
+        }
+
+        #year-slider-container {
+            z-index: 1000;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 75%;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            font-family: Arial, sans-serif;
+        }
+
+        #year-slider {
+            width: 100%;
+        }
+
+        #selected-year {
+            font-weight: bold;
+        }
+
         .legend {
             padding: 8px;
             background: white;
@@ -11,22 +48,19 @@
             font-size: 12px;
             color: #555;
         }
+
         .legend i {
             border-radius: 3px;
         }
-        </style>
-        
-<head>
-    <meta charset="UTF-8">
-    <title>Carte HDI interactive</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; }
-        #map { height: 100vh; }
     </style>
 </head>
 <body>
     <div id="map"></div>
+
+    <div id="year-slider-container">
+        Année sélectionnée : <span id="selected-year"></span><br>
+        <input type="range" id="year-slider" min="1990" max="2022" step="1" value="2022">
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
