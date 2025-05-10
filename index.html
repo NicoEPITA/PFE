@@ -2,28 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Carte interactive du monde</title>
+    <title>Carte HDI interactive</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-        #map {
-            height: 100vh;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; }
+        #map { height: 100vh; }
     </style>
 </head>
 <body>
     <div id="map"></div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- GeoJSON des frontières des pays -->
-    <script src="https://unpkg.com/world-atlas@2.0.2/countries-110m.json"></script>
-
     <script src="script.js"></script>
 </body>
 </html>
