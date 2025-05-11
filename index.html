@@ -38,6 +38,20 @@
             font-weight: bold;
         }
 
+        #continent-selector-container {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          background: white;
+          padding: 10px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0,0,0,0.2);
+          z-index: 1000;
+          font-family: Arial, sans-serif;
+        }
+
+        
+        
         .legend {
             padding: 8px;
             background: white;
@@ -55,6 +69,18 @@
     </style>
 </head>
 <body>
+    <div id="continent-selector-container">
+        <label for="continent-selector">Afficher les pays de : </label>
+        <select id="continent-selector">
+          <option value="world">Monde entier</option>
+          <option value="Africa">Afrique</option>
+          <option value="Asia">Asie</option>
+          <option value="Europe">Europe</option>
+          <option value="North America">Amérique du Nord</option>
+          <option value="South America">Amérique du Sud</option>
+          <option value="Oceania">Océanie</option>
+        </select>
+    </div>
     <div id="map"></div>
 
     <div id="year-slider-container">
@@ -63,6 +89,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="countryToContinent.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

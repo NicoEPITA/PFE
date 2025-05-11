@@ -12,6 +12,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 let geoLayer;
+let allGeoData;
 let hdiDataByYear = {};
 let availableYears = new Set();
 
@@ -77,76 +78,94 @@ async function loadHDIData() {
 async function initMap() {
     await loadHDIData();
 
-    const geoData = await fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+    allGeoData = await fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
         .then(res => res.json());
 
-    function style(feature) {
-        const year = parseInt(document.getElementById("year-slider").value);
-        let countryName = feature.properties.name;
-        for (let alias in countryAliases) {
-            if (countryAliases[alias] === countryName) {
-                countryName = alias;
-                break;
-            }
-        }
-        const hdi = hdiDataByYear[year]?.[countryName]?.hdi;
-        return {
-            fillColor: getColor(hdi),
-            weight: 1,
-            color: 'white',
-            fillOpacity: 0.7
-        };
-    }
-
-    function onEachFeature(feature, layer) {
-        const year = parseInt(document.getElementById("year-slider").value);
-        let countryName = feature.properties.name;
-        for (let alias in countryAliases) {
-            if (countryAliases[alias] === countryName) {
-                countryName = alias;
-                break;
-            }
-        }
-
-        const data = hdiDataByYear[year]?.[countryName];
-        const hdi = data?.hdi;
-        const gni = data?.gnipc;
-        const eys = data?.eys;
-        const mys = data?.mys;
-        const le = data?.le;
-
-        layer.bindPopup(`
-            <strong>${feature.properties.name}</strong><br>
-            HDI (${year}) : ${hdi ? hdi.toFixed(3) : "Donnée non disponible"}<br>
-            Revenu/hab. : ${gni ? gni.toLocaleString() + "$ PPA" : "Donnée non disponible"}<br>
-            Scolarité attendue : ${eys ? eys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
-            Scolarité moyenne : ${mys ? mys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
-            Espérance de vie : ${le ? le.toFixed(1) + " ans" : "Donnée non disponible"}
-
-        `);
-
-        layer.on({
-            mouseover: function (e) {
-                const layer = e.target;
-                layer.setStyle({
-                    weight: 3,
-                    color: '#000',
-                    fillOpacity: 0.9
-                });
-                layer.bringToFront();
-            },
-            mouseout: function (e) {
-                geoLayer.resetStyle(e.target);
-            }
-        });
-    }
-
-    geoLayer = L.geoJSON(geoData, {
-        style: style,
-        onEachFeature: onEachFeature
-    }).addTo(map);
-
+    drawMap();
     setupSlider();
+    setupContinentFilter();
+}
+
+function drawMap(continent = "world") {
+    if (geoLayer) {
+        map.removeLayer(geoLayer);
+    }
+
+    const year = parseInt(document.getElementById("year-slider").value);
+
+    const filteredFeatures = allGeoData.features.filter(feature => {
+        let countryName = feature.properties.name;
+    
+        // Appliquer l'alias s'il existe
+        for (let alias in countryAliases) {
+            if (countryAliases[alias] === countryName) {
+                countryName = alias;
+                break;
+            }
+        }
+    
+        const mappedContinent = countryToContinent[countryName];
+        return continent === "world" || mappedContinent === continent;
+    });
+    
+
+    geoLayer = L.geoJSON({ type: "FeatureCollection", features: filteredFeatures }, {
+        style: feature => {
+            let countryName = feature.properties.name;
+            for (let alias in countryAliases) {
+                if (countryAliases[alias] === countryName) {
+                    countryName = alias;
+                    break;
+                }
+            }
+            const hdi = hdiDataByYear[year]?.[countryName]?.hdi;
+            return {
+                fillColor: getColor(hdi),
+                weight: 1,
+                color: 'white',
+                fillOpacity: 0.7
+            };
+        },
+        onEachFeature: (feature, layer) => {
+            let countryName = feature.properties.name;
+            for (let alias in countryAliases) {
+                if (countryAliases[alias] === countryName) {
+                    countryName = alias;
+                    break;
+                }
+            }
+            const data = hdiDataByYear[year]?.[countryName];
+            const hdi = data?.hdi;
+            const gni = data?.gnipc;
+            const eys = data?.eys;
+            const mys = data?.mys;
+            const le = data?.le;
+
+            layer.bindPopup(`
+                <strong>${feature.properties.name}</strong><br>
+                HDI (${year}) : ${hdi ? hdi.toFixed(3) : "Donnée non disponible"}<br>
+                Revenu/hab. : ${gni ? gni.toLocaleString() + " $ PPP" : "Donnée non disponible"}<br>
+                Scolarité attendue : ${eys ? eys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
+                Scolarité moyenne : ${mys ? mys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
+                Espérance de vie : ${le ? le.toFixed(1) + " ans" : "Donnée non disponible"}
+            `);
+
+            layer.on({
+                mouseover: function (e) {
+                    const layer = e.target;
+                    layer.setStyle({
+                        weight: 3,
+                        color: '#000',
+                        fillOpacity: 0.9
+                    });
+                    layer.bringToFront();
+                },
+                mouseout: function (e) {
+                    geoLayer.resetStyle(e.target);
+                }
+            });
+        }
+    }).addTo(map);
 }
 
 function setupSlider() {
@@ -161,50 +180,14 @@ function setupSlider() {
 
     slider.addEventListener("input", () => {
         label.textContent = slider.value;
+        drawMap(document.getElementById("continent-selector").value);
+    });
+}
 
-        geoLayer.setStyle(feature => {
-            let countryName = feature.properties.name;
-            for (let alias in countryAliases) {
-                if (countryAliases[alias] === countryName) {
-                    countryName = alias;
-                    break;
-                }
-            }
-            const hdi = hdiDataByYear[slider.value]?.[countryName]?.hdi;
-            return {
-                fillColor: getColor(hdi),
-                weight: 1,
-                color: 'white',
-                fillOpacity: 0.7
-            };
-        });
-
-        geoLayer.eachLayer(layer => {
-            let countryName = layer.feature.properties.name;
-            for (let alias in countryAliases) {
-                if (countryAliases[alias] === countryName) {
-                    countryName = alias;
-                    break;
-                }
-            }
-
-            const data = hdiDataByYear[slider.value]?.[countryName];
-            const hdi = data?.hdi;
-            const gni = data?.gnipc;
-            const eys = data?.eys;
-            const mys = data?.mys;
-            const le = data?.le;
-
-            layer.bindPopup(`
-                <strong>${layer.feature.properties.name}</strong><br>
-                HDI (${slider.value}) : ${hdi ? hdi.toFixed(3) : "Donnée non disponible"}<br>
-                Revenu/hab. : ${gni ? gni.toLocaleString() + "$ PPA" : "Donnée non disponible"}<br>
-                Scolarité attendue : ${eys ? eys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
-                Scolarité moyenne : ${mys ? mys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
-                Espérance de vie : ${le ? le.toFixed(1) + " ans" : "Donnée non disponible"}
-
-            `);
-        });
+function setupContinentFilter() {
+    const selector = document.getElementById("continent-selector");
+    selector.addEventListener("change", () => {
+        drawMap(selector.value);
     });
 }
 
