@@ -182,6 +182,75 @@ function setupSlider() {
         label.textContent = slider.value;
         drawMap(document.getElementById("continent-selector").value);
     });
+    let intervalId = null;
+const playButton = document.getElementById("play-button");
+
+playButton.addEventListener("click", () => {
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        playButton.textContent = "▶️ Lecture";
+    } else {
+        let currentYear = parseInt(slider.value);
+        const maxYear = parseInt(slider.max);
+        intervalId = setInterval(() => {
+            if (currentYear > maxYear) {
+                clearInterval(intervalId);
+                intervalId = null;
+                playButton.textContent = "▶️ Lecture";
+                return;
+            }
+
+            slider.value = currentYear;
+            label.textContent = currentYear;
+            geoLayer.setStyle(feature => {
+                let countryName = feature.properties.name;
+                for (let alias in countryAliases) {
+                    if (countryAliases[alias] === countryName) {
+                        countryName = alias;
+                        break;
+                    }
+                }
+                const hdi = hdiDataByYear[currentYear]?.[countryName]?.hdi;
+                return {
+                    fillColor: getColor(hdi),
+                    weight: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                };
+            });
+
+            geoLayer.eachLayer(layer => {
+                let countryName = layer.feature.properties.name;
+                for (let alias in countryAliases) {
+                    if (countryAliases[alias] === countryName) {
+                        countryName = alias;
+                        break;
+                    }
+                }
+                const data = hdiDataByYear[currentYear]?.[countryName];
+                const hdi = data?.hdi;
+                const gni = data?.gnipc;
+                const eys = data?.eys;
+                const mys = data?.mys;
+                const le = data?.le;
+
+                layer.bindPopup(`
+                    <strong>${layer.feature.properties.name}</strong><br>
+                    HDI (${currentYear}) : ${hdi ? hdi.toFixed(3) : "Donnée non disponible"}<br>
+                    Revenu/hab. : ${gni ? gni.toLocaleString() + " $ PPP" : "Donnée non disponible"}<br>
+                    Scolarité attendue : ${eys ? eys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
+                    Scolarité moyenne : ${mys ? mys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
+                    Espérance de vie : ${le ? le.toFixed(1) + " ans" : "Donnée non disponible"}
+                `);
+            });
+
+            currentYear++;
+        }, 200);
+
+        playButton.textContent = "⏸ Pause";
+    }
+});
 }
 
 function setupContinentFilter() {
