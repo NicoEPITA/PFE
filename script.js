@@ -18,28 +18,30 @@ let availableYears = new Set();
 // Correspondances pour assurer que les noms matchent avec le GeoJSON
 const countryAliases = {
     "United States": "United States of America",
-    "Democratic Republic of the Congo": "Democratic Republic of Congo",
+    "Congo (Democratic Republic of the)" : "Democratic Republic of the Congo",
     "Czechia": "Czech Republic",
-    "Russia": "Russian Federation",
-    "South Korea": "Republic of Korea",
-    "North Korea": "Democratic People's Republic of Korea",
-    "Syria": "Syrian Arab Republic",
-    "Iran": "Iran (Islamic Republic of)",
-    "Venezuela": "Venezuela (Bolivarian Republic of)",
-    "Vietnam": "Viet Nam",
-    "Laos": "Lao People's Democratic Republic",
-    "Ivory Coast": "Côte d'Ivoire",
-    "Tanzania": "United Republic of Tanzania",
-    "Bolivia": "Bolivia (Plurinational State of)",
+    "Russian Federation": "Russia",
+    "Korea (Republic of)" : "South Korea",
+    "Democratic People's Republic of Korea" : "North Korea",
+    "Syrian Arab Republic" : "Syria",
+    "Iran (Islamic Republic of)": "Iran",
+    "Venezuela (Bolivarian Republic of)" : "Venezuela",
+    "Viet Nam" : "Vietnam",
+    "Lao People's Democratic Republic" : "Laos",
+    "C�te d'Ivoire" : "Ivory Coast",
+    "Tanzania (United Republic of)" : "United Republic of Tanzania",
+    "Bolivia (Plurinational State of)" : "Bolivia",
     "Brunei": "Brunei Darussalam",
-    "Moldova": "Republic of Moldova",
+    "Moldova (Republic of)" : "Moldova",
     "Palestine": "State of Palestine",
-    "Micronesia": "Micronesia (Federated States of)"
+    "Micronesia": "Micronesia (Federated States of)",
+    "Serbia" : "Republic of Serbia",
+    "Guinea-Bissau" : "Guinea Bissau",
 };
 
 // Couleur douce du rouge au vert selon HDI
 function getColor(hdi) {
-    if (isNaN(hdi)) return '#ccc';
+    if (isNaN(hdi)) return '#666';
     const red = hdi < 0.5 ? 220 : Math.round(220 - (hdi - 0.5) * 2 * 220);
     const green = hdi > 0.5 ? 180 : Math.round(hdi * 2 * 180);
     const blue = hdi > 0.5 ? Math.round((hdi - 0.5) * 2 * 120) : 0;
@@ -187,6 +189,9 @@ legend.onAdd = function () {
         const color = getColor((grades[i] + grades[i + 1]) / 2);
         div.innerHTML += `<i style="background:${color};width:18px;height:18px;float:left;margin-right:5px;opacity:0.8;"></i> ${grades[i]} - ${grades[i + 1]}<br>`;
     }
+
+    div.innerHTML += `<i style="background:#666;width:18px;height:18px;float:left;margin-right:5px;opacity:0.8;"></i> Données non disponibles<br>`;
+
     return div;
 };
 legend.addTo(map);
