@@ -256,9 +256,35 @@ playButton.addEventListener("click", () => {
 function setupContinentFilter() {
     const selector = document.getElementById("continent-selector");
     selector.addEventListener("change", () => {
-        drawMap(selector.value);
+        const selectedContinent = selector.value;
+        drawMap(selectedContinent);
+
+        if (selectedContinent === "world") {
+            map.setView([20, 0], 2); // vue globale
+            return;
+        }
+
+        // Récupérer les features du continent
+        const filteredFeatures = allGeoData.features.filter(feature => {
+            let countryName = feature.properties.name;
+            for (let alias in countryAliases) {
+                if (countryAliases[alias] === countryName) {
+                    countryName = alias;
+                    break;
+                }
+            }
+            return countryToContinent[countryName] === selectedContinent;
+        });
+
+        if (filteredFeatures.length > 0) {
+            const group = L.featureGroup(filteredFeatures.map(f =>
+                L.geoJSON(f)
+            ));
+            map.fitBounds(group.getBounds().pad(0.2));
+        }
     });
 }
+
 
 const legend = L.control({ position: 'bottomright' });
 legend.onAdd = function () {
