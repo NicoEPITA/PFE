@@ -274,4 +274,39 @@ legend.onAdd = function () {
 };
 legend.addTo(map);
 
+document.getElementById("fullscreen-toggle").addEventListener("click", () => {
+    const mapContainer = document.getElementById("map-card-container");
+
+    if (!document.fullscreenElement) {
+        mapContainer.requestFullscreen().catch(err => {
+            alert(`Erreur de passage en plein écran : ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+});
+
+document.getElementById("export-button").addEventListener("click", () => {
+    const year = document.getElementById("year-slider").value;
+
+    const mapContainer = document.getElementById("map-card-container");
+
+    // Attendre un court instant avant capture (par précaution visuelle)
+    setTimeout(() => {
+        html2canvas(mapContainer, {
+            useCORS: true,
+            allowTaint: true,
+            scale: 2,
+            windowWidth: mapContainer.scrollWidth,
+            windowHeight: mapContainer.scrollHeight
+        }).then(canvas => {
+            const link = document.createElement("a");
+            link.download = `carte-hdi-${year}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    }, 200);
+});
+
+
 initMap();

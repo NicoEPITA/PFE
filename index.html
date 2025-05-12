@@ -12,7 +12,7 @@
         }
 
         #map {
-            height: 100vh;
+            height: 600px;
         }
 
         #year-slider-container {
@@ -50,7 +50,25 @@
           font-family: Arial, sans-serif;
         }
 
-        
+        :fullscreen {
+            background: white;
+        }
+
+        #map-card-container:fullscreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: stretch;
+            align-items: stretch;
+            background: white;
+            width: 100%;
+            height: 100%;
+        }
+
+        #map-card-container:fullscreen #map {
+            flex: 1;
+            height: 100%;
+        }
+
         
         .legend {
             padding: 8px;
@@ -69,7 +87,7 @@
     </style>
 </head>
 <body>
-    <div id="continent-selector-container">
+    <!-- <div id="continent-selector-container">
         <label for="continent-selector">Afficher les pays de : </label>
         <select id="continent-selector">
           <option value="world">Monde entier</option>
@@ -80,17 +98,81 @@
           <option value="South America">Amérique du Sud</option>
           <option value="Oceania">Océanie</option>
         </select>
-    </div>
-    <div id="map"></div>
+    </div> -->
+    
+    <div id="map-card-container" style="
+  position: relative;
+  width: 90%;
+  margin: 30px auto;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+">
+  <div id="map" style="height: 600px;"></div>
 
-    <div id="year-slider-container">
+  <!-- Filtre continent -->
+  <div style="padding: 10px; display: flex; justify-content: center;">
+    <label for="continent-selector" style="margin-right: 8px;">Afficher les pays de :</label>
+    <select id="continent-selector">
+      <option value="world">Monde entier</option>
+      <option value="Africa">Afrique</option>
+      <option value="Asia">Asie</option>
+      <option value="Europe">Europe</option>
+      <option value="North America">Amérique du Nord</option>
+      <option value="South America">Amérique du Sud</option>
+      <option value="Oceania">Océanie</option>
+    </select>
+  </div>
+
+  <!-- Slider année -->
+    <div style="padding: 10px;">
+        <div style="text-align: center;">
+          Année sélectionnée : <span id="selected-year"></span><br>
+          <input type="range" id="year-slider" min="1990" max="2023" step="1" value="2023" style="width: 80%;">
+          <button id="play-button" style="
+            margin-left: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+          ">▶️ Lecture</button>
+        </div>
+      
+        <!-- Icône plein écran alignée à droite -->
+        <div style="text-align: right; margin-top: 10px;">
+            <!-- Bouton Export -->
+          <button id="export-button" style="
+          background: none;
+          border: none;
+          margin-right: 10px;
+          cursor: pointer;
+        ">
+          <img src="download.png" alt="Exporter la carte" style="width: 24px; height: 24px;">
+        </button>
+
+          <button id="fullscreen-toggle" style="
+            background: none;
+            border: none;
+            cursor: pointer;
+          ">
+            <img src="fullscreen.png" alt="Plein écran" style="width: 24px; height: 24px;">
+          </button>
+        </div>
+  
+
+
+    <!-- <div id="year-slider-container">
         Année sélectionnée : <span id="selected-year"></span><br>
         <input type="range" id="year-slider" min="1990" max="2023" step="1" value="2023">
         <button id="play-button">▶️ Lecture</button>
-      </div>      
+      </div>       -->
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="countryToContinent.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
