@@ -44,27 +44,33 @@ const mentalLayers = {
 };
 
 const countryAliases = {
-    "United States": "United States of America",
-    "Congo (Democratic Republic of the)": "Democratic Republic of the Congo",
-    "Czechia": "Czech Republic",
-    "Russian Federation": "Russia",
-    "Korea (Republic of)": "South Korea",
-    "Democratic People's Republic of Korea": "North Korea",
-    "Syrian Arab Republic": "Syria",
-    "Iran (Islamic Republic of)": "Iran",
-    "Venezuela (Bolivarian Republic of)": "Venezuela",
-    "Viet Nam": "Vietnam",
-    "Lao People's Democratic Republic": "Laos",
-    "Côte d'Ivoire": "Ivory Coast",
-    "Tanzania (United Republic of)": "United Republic of Tanzania",
+    "Africa (IHME GBD)": "Africa",
+    "America (IHME GBD)": "Americas",
+    "American Samoa": "Oceania",
+    "Andorra": "Europe",
+    "Antigua and Barbuda": "North America",
     "Bolivia (Plurinational State of)": "Bolivia",
     "Brunei": "Brunei Darussalam",
+    "Côte d'Ivoire": "Ivory Coast",
+    "Congo (Democratic Republic of the)": "Democratic Republic of the Congo",
+    "Czechia": "Czech Republic",
+    "Democratic People's Republic of Korea": "North Korea",
+    "Guinea-Bissau": "Guinea Bissau",
+    "Iran (Islamic Republic of)": "Iran",
+    "Korea (Republic of)": "South Korea",
+    "Lao People's Democratic Republic": "Laos",
+    "Micronesia": "Micronesia (Federated States of)",
     "Moldova (Republic of)": "Moldova",
     "Palestine": "State of Palestine",
-    "Micronesia": "Micronesia (Federated States of)",
+    "Russian Federation": "Russia",
     "Serbia": "Republic of Serbia",
-    "Guinea-Bissau": "Guinea Bissau"
+    "Syrian Arab Republic": "Syria",
+    "Tanzania (United Republic of)": "United Republic of Tanzania",
+    "United States": "United States of America",
+    "Venezuela (Bolivarian Republic of)": "Venezuela",
+    "Viet Nam": "Vietnam"
 };
+
 
 function getColor(hdi) {
     if (isNaN(hdi)) return '#666';
