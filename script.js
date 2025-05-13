@@ -11,10 +11,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+let mentalDataByYear = {};
 let geoLayer;
 let allGeoData;
 let hdiDataByYear = {};
 let availableYears = new Set();
+let displayMode = "hdi";
 
 const countryAliases = {
     "United States": "United States of America",
@@ -47,6 +49,20 @@ function getColor(hdi) {
     return `rgb(${red},${green},${blue})`;
 }
 
+function getMentalColor(score) {
+    if (isNaN(score)) return '#666';
+
+    const scoreFraction = score / 100; // car score est donné en %
+    const scaled = Math.min(scoreFraction / 0.2, 1); // 7% max
+    const red = Math.round(255 * scaled);
+    const blue = Math.round(255 * (1 - scaled));
+    const green = 60;
+
+    return `rgb(${red},${green},${blue})`;
+}
+
+
+
 async function loadHDIData() {
     const res = await fetch('hdr-data.csv');
     const text = await res.text();
@@ -75,8 +91,38 @@ async function loadHDIData() {
     }
 }
 
+async function loadMentalHealthData() {
+    const res = await fetch('mental-illnesses-prevalence.csv');
+    const text = await res.text();
+    const lines = text.split('\n');
+    const header = lines[0].split(',');
+
+    const yearCol = header.indexOf('Year');
+    const countryCol = header.indexOf('Entity');
+    const depressionCol = header.findIndex(col => col.startsWith('Depressive'));
+    const anxietyCol = header.findIndex(col => col.startsWith('Anxiety'));
+
+    for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        const year = parseInt(cols[yearCol]);
+        const country = cols[countryCol]?.trim();
+        const depression = parseFloat(cols[depressionCol]);
+        const anxiety = parseFloat(cols[anxietyCol]);
+
+        if (!country || isNaN(year)) continue;
+
+        if (!mentalDataByYear[year]) mentalDataByYear[year] = {};
+        mentalDataByYear[year][country] = {
+            depression: !isNaN(depression) ? depression.toFixed(2) : null,
+            anxiety: !isNaN(anxiety) ? anxiety.toFixed(2) : null
+        };
+    }
+}
+
+
 async function initMap() {
     await loadHDIData();
+    await loadMentalHealthData();
 
     allGeoData = await fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
         .then(res => res.json());
@@ -84,7 +130,13 @@ async function initMap() {
     drawMap();
     setupSlider();
     setupContinentFilter();
+    document.getElementById("mode-selector").addEventListener("change", (e) => {
+        displayMode = e.target.value;
+        drawMap(document.getElementById("continent-selector").value);
+    });
+    
 }
+
 
 function drawMap(continent = "world") {
     if (geoLayer) {
@@ -95,7 +147,7 @@ function drawMap(continent = "world") {
 
     const filteredFeatures = allGeoData.features.filter(feature => {
         let countryName = feature.properties.name;
-    
+
         // Appliquer l'alias s'il existe
         for (let alias in countryAliases) {
             if (countryAliases[alias] === countryName) {
@@ -103,11 +155,10 @@ function drawMap(continent = "world") {
                 break;
             }
         }
-    
+
         const mappedContinent = countryToContinent[countryName];
         return continent === "world" || mappedContinent === continent;
     });
-    
 
     geoLayer = L.geoJSON({ type: "FeatureCollection", features: filteredFeatures }, {
         style: feature => {
@@ -118,13 +169,27 @@ function drawMap(continent = "world") {
                     break;
                 }
             }
-            const hdi = hdiDataByYear[year]?.[countryName]?.hdi;
-            return {
-                fillColor: getColor(hdi),
-                weight: 1,
-                color: 'white',
-                fillOpacity: 0.7
-            };
+        
+            const year = parseInt(document.getElementById("year-slider").value);
+        
+            if (displayMode === "hdi") {
+                const hdi = hdiDataByYear[year]?.[countryName]?.hdi;
+                return {
+                    fillColor: getColor(hdi),
+                    weight: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                };
+            } else {
+                const mental = mentalDataByYear[year]?.[countryName];
+                const combinedScore = mental ? (parseFloat(mental.depression) + parseFloat(mental.anxiety)) : NaN;
+                return {
+                    fillColor: getMentalColor(combinedScore),
+                    weight: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                };
+            }
         },
         onEachFeature: (feature, layer) => {
             let countryName = feature.properties.name;
@@ -134,6 +199,7 @@ function drawMap(continent = "world") {
                     break;
                 }
             }
+
             const data = hdiDataByYear[year]?.[countryName];
             const hdi = data?.hdi;
             const gni = data?.gnipc;
@@ -141,13 +207,19 @@ function drawMap(continent = "world") {
             const mys = data?.mys;
             const le = data?.le;
 
+            const mental = mentalDataByYear[year]?.[countryName];
+            const depression = mental?.depression;
+            const anxiety = mental?.anxiety;
+
             layer.bindPopup(`
                 <strong>${feature.properties.name}</strong><br>
                 HDI (${year}) : ${hdi ? hdi.toFixed(3) : "Donnée non disponible"}<br>
                 Revenu/hab. : ${gni ? gni.toLocaleString() + " $ PPP" : "Donnée non disponible"}<br>
                 Scolarité attendue : ${eys ? eys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
                 Scolarité moyenne : ${mys ? mys.toFixed(1) + " ans" : "Donnée non disponible"}<br>
-                Espérance de vie : ${le ? le.toFixed(1) + " ans" : "Donnée non disponible"}
+                Espérance de vie : ${le ? le.toFixed(1) + " ans" : "Donnée non disponible"}<br>
+                Troubles dépressifs : ${depression ? depression + " %" : "Donnée non disponible"}<br>
+                Troubles anxieux : ${anxiety ? anxiety + " %" : "Donnée non disponible"}
             `);
 
             layer.on({
@@ -167,6 +239,7 @@ function drawMap(continent = "world") {
         }
     }).addTo(map);
 }
+
 
 function setupSlider() {
     const slider = document.getElementById("year-slider");
