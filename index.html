@@ -84,31 +84,42 @@
         .legend i {
             border-radius: 3px;
         }
+        #mental-toggle-container {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #mental-toggle-container label {
+            background: #f0f0f0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        nav a:hover {
+            text-decoration: underline;
+          }
+
     </style>
 </head>
 <body>
-    <!-- <div id="continent-selector-container">
-        <label for="continent-selector">Afficher les pays de : </label>
-        <select id="continent-selector">
-          <option value="world">Monde entier</option>
-          <option value="Africa">Afrique</option>
-          <option value="Asia">Asie</option>
-          <option value="Europe">Europe</option>
-          <option value="North America">Amérique du Nord</option>
-          <option value="South America">Amérique du Sud</option>
-          <option value="Oceania">Océanie</option>
-        </select>
-    </div> -->
+    <nav style="background: #222; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-weight: bold;">Santé mentale & HDI</div>
+        <div>
+            <a href="index.html" style="color: white; text-decoration: none; margin-right: 20px;">Carte interactive</a>
+            <a href="resultats.html" style="color: white; text-decoration: none;">Résultats observés</a>
+        </div>
+    </nav>
+      
     
     <div id="map-card-container" style="
-  position: relative;
-  width: 90%;
-  margin: 30px auto;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-">
+        position: relative;
+        width: 90%;
+        margin: 30px auto;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    ">
   <div id="map" style="height: 600px;"></div>
 
   <!-- Filtre continent -->
@@ -124,20 +135,20 @@
       <option value="Oceania">Océanie</option>
     </select>
   </div>
-
-  <!-- Slider année -->
-    <div style="text-align: center; margin-bottom: 10px;">
-        <label for="mode-selector">Afficher selon :</label>
-        <select id="mode-selector">
-        <option value="hdi">Indice de développement humain (HDI)</option>
-        <option value="mental">Troubles mentaux (dépression + anxiété)</option>
-        </select>
-    </div>
+  <!-- Choix des troubles mentaux -->
+<div style="padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;" id="mental-toggle-container">
+    <label><input type="checkbox" class="mental-toggle" value="depression" checked> Dépression</label>
+    <label><input type="checkbox" class="mental-toggle" value="anxiety" checked> Anxiété</label>
+    <label><input type="checkbox" class="mental-toggle" value="bipolar" checked> Bipolarité</label>
+    <label><input type="checkbox" class="mental-toggle" value="schizophrenia" checked> Schizophrénie</label>
+    <label><input type="checkbox" class="mental-toggle" value="eating" checked> Troubles alimentaires</label>
+  </div>
+      
   
     <div style="padding: 10px;">
         <div style="text-align: center;">
           Année sélectionnée : <span id="selected-year"></span><br>
-          <input type="range" id="year-slider" min="1990" max="2023" step="1" value="2023" style="width: 80%;">
+          <input type="range" id="year-slider" min="1990" max="2019" step="1" value="2023" style="width: 80%;">
           <button id="play-button" style="
             margin-left: 10px;
             background: #28a745;
