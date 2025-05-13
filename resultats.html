@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Résultats observés</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background-color: #f9f9f9;
     }
     nav {
       background: #222;
@@ -27,12 +29,27 @@
     }
     main {
       padding: 30px;
-      max-width: 900px;
+      max-width: 1100px;
       margin: auto;
     }
     h1 {
       color: #333;
     }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    canvas {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      height: 400px;
+      min-height: 300px;
+      aspect-ratio: 4 / 3;
+    }
+
   </style>
 </head>
 <body>
@@ -45,20 +62,124 @@
   </nav>
 
   <main>
-    <h1>Résultats observés</h1>
-    <p>Voici quelques conclusions statistiques issues de la carte interactive :</p>
-    <ul>
-      <li>📉 Il existe une <strong>corrélation négative entre HDI et dépression</strong> (r = -0.45).</li>
-      <li>📈 Une <strong>corrélation positive est observée pour l’anxiété</strong> (r = +0.39).</li>
-      <li>🧠 Les troubles comme la <strong>schizophrénie</strong> et les <strong>troubles alimentaires</strong> sont plus fréquents dans les pays à HDI élevé.</li>
-    </ul>
+    <h1>Corrélations entre HDI et troubles mentaux</h1>
+    <p>Les graphiques suivants illustrent les relations statistiques entre l'indice de développement humain (HDI) et la prévalence de différents troubles mentaux.</p>
 
-    <h2>Hypothèses explicatives</h2>
-    <p>Dans les pays les plus développés :</p>
-    <ul>
-      <li>Le diagnostic est plus fréquent grâce à un meilleur accès aux soins.</li>
-      <li>Le mode de vie moderne peut contribuer à certains troubles (anxiété, troubles alimentaires).</li>
-    </ul>
+    <div class="charts-grid">
+      <canvas id="chartDepression"></canvas>
+      <canvas id="chartAnxiety"></canvas>
+      <canvas id="chartSchizophrenia"></canvas>
+      <canvas id="chartEating"></canvas>
+    </div>
   </main>
+
+  <script>
+    const createChart = (ctxId, label, hdiData, mentalData, color, maxY = 8) => {
+  new Chart(document.getElementById(ctxId), {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: label,
+        data: hdiData.map((hdi, i) => ({ x: hdi, y: mentalData[i] })),
+        backgroundColor: color,
+      }]
+    },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'HDI'
+          },
+          min: 0.3,
+          max: 1.0
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Prévalence (%)'
+          },
+          min: 0,
+          max: maxY
+        }
+      }
+    }
+  });
+};
+
+    async function loadAndPlot() {
+      const [mentalRes, hdiRes] = await Promise.all([
+        fetch('mental-illnesses-prevalence.csv').then(res => res.text()),
+        fetch('hdr-data.csv').then(res => res.text())
+      ]);
+
+      const mentalLines = mentalRes.split('\n');
+      const mentalHeader = mentalLines[0].split(',');
+      const hdiLines = hdiRes.split('\n');
+      const hdiHeader = hdiLines[0].split(';');
+
+      const mentalYearCol = mentalHeader.indexOf('Year');
+      const mentalCountryCol = mentalHeader.indexOf('Entity');
+      const keys = {
+        depression: 'Depressive disorders',
+        anxiety: 'Anxiety disorders',
+        schizophrenia: 'Schizophrenia disorders',
+        eating: 'Eating disorders'
+      };
+
+      const colsMap = {};
+      for (let key in keys) {
+        colsMap[key] = mentalHeader.findIndex(h => h.startsWith(keys[key]));
+      }
+
+      const hdiIndicatorCol = hdiHeader.indexOf('indicatorCode');
+      const hdiYearCol = hdiHeader.indexOf('year');
+      const hdiCountryCol = hdiHeader.indexOf('country');
+      const hdiValueCol = hdiHeader.indexOf('value');
+
+      const hdiByCountry = {};
+      for (let i = 1; i < hdiLines.length; i++) {
+        const cols = hdiLines[i].split(';');
+        if (cols[hdiIndicatorCol] === 'hdi' && cols[hdiYearCol] === '2019') {
+          const country = cols[hdiCountryCol]?.trim();
+          const value = parseFloat(cols[hdiValueCol]?.replace(',', '.'));
+          if (country && !isNaN(value)) hdiByCountry[country] = value;
+        }
+      }
+
+      const dataPoints = {
+        depression: [],
+        anxiety: [],
+        schizophrenia: [],
+        eating: []
+      };
+
+      for (let i = 1; i < mentalLines.length; i++) {
+        const cols = mentalLines[i].split(',');
+        if (cols[mentalYearCol] !== '2019') continue;
+        const country = cols[mentalCountryCol]?.trim();
+        const hdi = hdiByCountry[country];
+        if (!country || isNaN(hdi)) continue;
+
+        for (let key in dataPoints) {
+          const val = parseFloat(cols[colsMap[key]]);
+          if (!isNaN(val)) dataPoints[key].push({ hdi, val });
+        }
+      }
+
+      const hdiSorted = key => dataPoints[key].map(e => e.hdi);
+      const valsSorted = key => dataPoints[key].map(e => e.val);
+
+      createChart("chartDepression", "HDI vs Dépression", hdiSorted('depression'), valsSorted('depression'), '#e41a1c');
+      createChart("chartAnxiety", "HDI vs Anxiété", hdiSorted('anxiety'), valsSorted('anxiety'), '#377eb8');
+      createChart("chartSchizophrenia", "HDI vs Schizophrénie", hdiSorted('schizophrenia'), valsSorted('schizophrenia'), '#ff7f00', 1);
+      createChart("chartEating", "HDI vs Troubles alimentaires", hdiSorted('eating'), valsSorted('eating'), '#4daf4a', 1.5);
+    }
+
+    loadAndPlot();
+  </script>
 </body>
 </html>
