@@ -17,7 +17,7 @@ const countryToContinent = {
     "Bosnia and Herzegovina": "Europe",
     "Botswana": "Africa",
     "Brazil": "South America",
-    "/home/quentin/PFEBrunei Darussalam": "Asia",
+    "Brunei Darussalam": "Asia",
     "Bulgaria": "Europe",
     "Burkina Faso": "Africa",
     "Burundi": "Africa",
