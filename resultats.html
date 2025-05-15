@@ -49,7 +49,6 @@
       min-height: 300px;
       aspect-ratio: 4 / 3;
     }
-
   </style>
 </head>
 <body>
@@ -71,7 +70,19 @@
       <canvas id="chartSchizophrenia"></canvas>
       <canvas id="chartEating"></canvas>
     </div>
-  </main>
+  <section style="margin-top: 40px;">
+  <h2>Conclusions</h2>
+  <ul style="line-height: 1.8;">
+    <li>✅ Les pays avec un HDI plus élevé présentent une plus forte prévalence de <strong>troubles alimentaires</strong> et de <strong>troubles anxieux</strong>. Cela pourrait s'expliquer par des facteurs comme la pression sociale, le stress professionnel et les normes esthétiques.</li>
+    <li>🧠 En revanche, la <strong>dépression</strong> semble légèrement plus présente dans les pays à HDI plus bas, ce qui suggère un lien avec des conditions socio-économiques défavorables.</li>
+    <li>⚠️ La <strong>schizophrénie</strong> montre une faible prévalence dans tous les pays, sans corrélation marquée avec le HDI.</li>
+    <li>📊 L'analyse visuelle permet de mieux comprendre que le développement humain n’est pas un facteur de protection unique : certains troubles augmentent avec le confort de vie.</li>
+    <li>🌍 Il serait pertinent d’ajouter d’autres variables (inégalités, urbanisation, accès aux soins) pour compléter cette première corrélation brute.</li>
+    <li>📅 Seuls les chiffres de 2019 ont été analysés ici, mais une extension temporelle pourrait révéler des dynamiques d’évolution plus riches.</li>
+  </ul>
+</section>
+
+$1
 
   <script>
     const createChart = (ctxId, label, hdiData, mentalData, color, maxY = 8) => {
@@ -87,7 +98,6 @@
     options: {
       responsive: false,
       maintainAspectRatio: false,
-
       scales: {
         x: {
           title: {
