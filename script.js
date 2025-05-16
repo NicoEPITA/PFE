@@ -18,6 +18,8 @@ let allGeoData;
 let hdiDataByYear = {};
 let mentalDataByYear = {};
 let availableYears = new Set();
+let isPlaying = false;
+let playInterval = null;
 
 const colorByTrouble = {
     depression: '#e41a1c',
@@ -51,7 +53,7 @@ const countryAliases = {
     "Antigua and Barbuda": "North America",
     "Bolivia (Plurinational State of)": "Bolivia",
     "Brunei": "Brunei Darussalam",
-    "Côte d'Ivoire": "Ivory Coast",
+    "C�te d'Ivoire": "Ivory Coast",
     "Congo (Democratic Republic of the)": "Democratic Republic of the Congo",
     "Czechia": "Czech Republic",
     "Democratic People's Republic of Korea": "North Korea",
@@ -59,7 +61,7 @@ const countryAliases = {
     "Iran (Islamic Republic of)": "Iran",
     "Korea (Republic of)": "South Korea",
     "Lao People's Democratic Republic": "Laos",
-    "Micronesia": "Micronesia (Federated States of)",
+    "Micronesia (Federated States of)" : "Micronesia",
     "Moldova (Republic of)": "Moldova",
     "Palestine": "State of Palestine",
     "Russian Federation": "Russia",
@@ -271,9 +273,93 @@ function setupContinentSelector() {
     const selector = document.getElementById("continent-selector");
     selector.addEventListener("change", () => {
         const year = parseInt(document.getElementById("year-slider").value);
-        drawHDIMap(year, selector.value);
-        drawMentalLayers(year, selector.value);
+        const selectedContinent = selector.value;
+
+        drawHDIMap(year, selectedContinent);
+        drawMentalLayers(year, selectedContinent);
+
+        if (selectedContinent === "world") {
+            map.setView([20, 0], 2);
+            return;
+        }
+
+        const filteredFeatures = allGeoData.features.filter(feature => {
+            let name = feature.properties.name;
+            for (let alias in countryAliases) {
+                if (countryAliases[alias] === name) {
+                    name = alias;
+                    break;
+                }
+            }
+            return countryToContinent[name] === selectedContinent;
+        });
+
+        if (filteredFeatures.length > 0) {
+            const bounds = L.geoJSON({ type: "FeatureCollection", features: filteredFeatures }).getBounds();
+            map.flyToBounds(bounds.pad(0.2), {
+                duration: 1.2,
+                easeLinearity: 0.25
+            });
+        }
     });
 }
 
+
 initMap();
+
+document.getElementById("fullscreen-toggle").addEventListener("click", () => {
+    const mapContainer = document.getElementById("map-card-container");
+
+    if (!document.fullscreenElement) {
+        mapContainer.requestFullscreen().catch(err => {
+            alert(`Erreur de passage en plein écran : ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+});
+
+document.addEventListener("fullscreenchange", () => {
+    setTimeout(() => map.invalidateSize(), 300);
+});
+
+document.getElementById("play-button").addEventListener("click", () => {
+    const button = document.getElementById("play-button");
+    const slider = document.getElementById("year-slider");
+    const label = document.getElementById("selected-year");
+    const selector = document.getElementById("continent-selector");
+
+    if (!isPlaying) {
+        isPlaying = true;
+        button.textContent = "⏸ Pause";
+
+        playInterval = setInterval(() => {
+            let currentYear = parseInt(slider.value);
+            const maxYear = parseInt(slider.max);
+            if (currentYear >= maxYear) {
+                clearInterval(playInterval);
+                button.textContent = "▶️ Lecture";
+                isPlaying = false;
+                return;
+            }
+
+            slider.value = currentYear + 1;
+            label.textContent = slider.value;
+            drawHDIMap(parseInt(slider.value), selector.value);
+            drawMentalLayers(parseInt(slider.value), selector.value);
+        }, 300);
+    } else {
+        clearInterval(playInterval);
+        button.textContent = "▶️ Lecture";
+        isPlaying = false;
+    }
+});
+window.addEventListener("DOMContentLoaded", () => {
+    const selector = document.getElementById("continent-selector");
+    const year = parseInt(document.getElementById("year-slider").value);
+
+    selector.value = "world";
+    drawHDIMap(year, "world");
+    drawMentalLayers(year, "world");
+});
+
