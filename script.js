@@ -384,8 +384,10 @@ function resolveCountryName(name) {
 
     const years = Array.from(availableYears).sort((a, b) => a - b);
 
+    // Données HDI
     const hdiData = years.map(y => hdiDataByYear[y]?.[country] ?? null);
 
+    // Données santé mentale
     const mentalTypes = ["depression", "anxiety", "bipolar", "schizophrenia", "eating"];
     const mentalLabels = {
         depression: "Dépression",
@@ -404,7 +406,7 @@ function resolveCountryName(name) {
 
     const datasets = [
         {
-            label: "HDI",
+            label: "IDH",
             data: hdiData,
             borderColor: "#2196f3",
             backgroundColor: "rgba(33,150,243,0.1)",
@@ -448,7 +450,7 @@ function resolveCountryName(name) {
                     position: 'left',
                     min: 0,
                     max: 1,
-                    title: { display: true, text: "HDI" }
+                    title: { display: true, text: "IDH (0–1)" }
                 },
                 y2: {
                     type: 'linear',
@@ -456,7 +458,7 @@ function resolveCountryName(name) {
                     min: 0,
                     max: 20,
                     grid: { drawOnChartArea: false },
-                    title: { display: true, text: "Prévalence (%)" }
+                    title: { display: true, text: "Prévalence santé mentale (%)" }
                 }
             },
             plugins: {
