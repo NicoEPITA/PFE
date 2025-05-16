@@ -363,3 +363,115 @@ window.addEventListener("DOMContentLoaded", () => {
     drawMentalLayers(year, "world");
 });
 
+function resolveCountryName(name) {
+    return Object.entries(countryAliases).find(([alias, official]) =>
+      name.toLowerCase() === alias.toLowerCase() || name.toLowerCase() === official.toLowerCase()
+    )?.[0] || name;
+  }
+  
+
+  document.getElementById("manual-search-button").addEventListener("click", () => {
+    const input = document.getElementById("manual-search").value.trim().toLowerCase();
+    const country = Object.keys(hdiDataByYear[1990] || {}).find(c => c.toLowerCase() === input);
+
+    if (!country) {
+        alert("Pays introuvable !");
+        document.getElementById("search-results").style.display = "none";
+        return;
+    }
+
+    document.getElementById("search-country-name").textContent = country;
+
+    const years = Array.from(availableYears).sort((a, b) => a - b);
+
+    const hdiData = years.map(y => hdiDataByYear[y]?.[country] ?? null);
+
+    const mentalTypes = ["depression", "anxiety", "bipolar", "schizophrenia", "eating"];
+    const mentalLabels = {
+        depression: "Dépression",
+        anxiety: "Anxiété",
+        bipolar: "Bipolarité",
+        schizophrenia: "Schizophrénie",
+        eating: "Troubles alimentaires"
+    };
+    const mentalColors = {
+        depression: "#e91e63",
+        anxiety: "#3f51b5",
+        bipolar: "#ffc107",
+        schizophrenia: "#009688",
+        eating: "#9c27b0"
+    };
+
+    const datasets = [
+        {
+            label: "HDI",
+            data: hdiData,
+            borderColor: "#2196f3",
+            backgroundColor: "rgba(33,150,243,0.1)",
+            yAxisID: "y1",
+            fill: true,
+            tension: 0.3
+        }
+    ];
+
+    mentalTypes.forEach(type => {
+        const data = years.map(y => mentalDataByYear[y]?.[country]?.[type] ?? null);
+        datasets.push({
+            label: mentalLabels[type],
+            data,
+            borderColor: mentalColors[type],
+            backgroundColor: mentalColors[type],
+            yAxisID: "y2",
+            fill: false,
+            tension: 0.3
+        });
+    });
+
+    const ctx = document.getElementById("search-country-chart").getContext("2d");
+    if (window.searchChart) window.searchChart.destroy();
+
+    window.searchChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                y1: {
+                    type: 'linear',
+                    position: 'left',
+                    min: 0,
+                    max: 1,
+                    title: { display: true, text: "HDI" }
+                },
+                y2: {
+                    type: 'linear',
+                    position: 'right',
+                    min: 0,
+                    max: 20,
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: "Prévalence (%)" }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    document.getElementById("search-results").style.display = "block";
+
+    const feature = allGeoData.features.find(f => f.properties.name.toLowerCase() === country.toLowerCase());
+    if (feature) {
+        const layer = L.geoJSON(feature);
+        map.flyToBounds(layer.getBounds().pad(0.3));
+    }
+});
+
+
